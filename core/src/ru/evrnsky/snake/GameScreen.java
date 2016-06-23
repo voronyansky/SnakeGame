@@ -1,6 +1,7 @@
 package ru.evrnsky.snake;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -42,6 +43,15 @@ public class GameScreen extends ScreenAdapter {
      */
     private int snakeY = 0;
 
+    /**
+     * This is constants for directions of movement
+     */
+    private static final int RIGHT = 0;
+    private static final int LEFT = 1;
+    private static final int UP = 2;
+    private static final int DOWN = 3;
+    private int snakeDirection = RIGHT;
+
 
     /**
      * At this method need init all variables and load textures
@@ -65,10 +75,12 @@ public class GameScreen extends ScreenAdapter {
          * If spend more than one second update timer and move snake
          */
         checkBoundaries();
+        handleInput();
+
         timer -= delta;
         if(timer <= 0) {
             timer = MOVE_TIME;
-            snakeX += SNAKE_MOVEMENT;
+            snakeMovement();
         }
 
         /**
@@ -85,6 +97,9 @@ public class GameScreen extends ScreenAdapter {
         batch.end();
     }
 
+    /**
+     * Checking that our snake do not exit from boundaries
+     */
     private void checkBoundaries() {
         if(snakeX + snakeHead.getWidth() > Gdx.graphics.getWidth())
             snakeX = Gdx.graphics.getWidth() - snakeHead.getWidth();
@@ -94,6 +109,40 @@ public class GameScreen extends ScreenAdapter {
             snakeY = Gdx.graphics.getHeight() - snakeHead.getHeight();
         else if(snakeY < 0)
                 snakeY = 0;
+    }
+
+    /**
+     * Handling input from user by choosing correct direct for snake
+     */
+    private void handleInput() {
+        boolean isRight = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+        boolean isLeft = Gdx.input.isKeyPressed(Input.Keys.LEFT);
+        boolean isUp = Gdx.input.isKeyPressed(Input.Keys.UP);
+        boolean isDown = Gdx.input.isKeyPressed(Input.Keys.DOWN);
+
+        if(isRight) snakeDirection = RIGHT;
+        if(isLeft) snakeDirection = LEFT;
+        if(isUp) snakeDirection = UP;
+        if(isDown) snakeDirection = DOWN;
+    }
+
+    /**
+     * Is it update snake position depends on direct
+     */
+    private void snakeMovement() {
+        switch(snakeDirection) {
+            case RIGHT:
+                snakeX += SNAKE_MOVEMENT;
+                break;
+            case LEFT:
+                snakeX -= SNAKE_MOVEMENT;
+                break;
+            case UP:
+                snakeY += SNAKE_MOVEMENT;
+                break;
+            case DOWN:
+                snakeY -= SNAKE_MOVEMENT;
+        }
     }
 
     /**
