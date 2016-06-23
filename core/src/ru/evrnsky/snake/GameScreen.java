@@ -64,6 +64,7 @@ public class GameScreen extends ScreenAdapter {
          * Calculate may snake movement
          * If spend more than one second update timer and move snake
          */
+        checkBoundaries();
         timer -= delta;
         if(timer <= 0) {
             timer = MOVE_TIME;
@@ -82,6 +83,17 @@ public class GameScreen extends ScreenAdapter {
         batch.begin();
         batch.draw(snakeHead, snakeX, snakeY);
         batch.end();
+    }
+
+    private void checkBoundaries() {
+        if(snakeX + snakeHead.getWidth() > Gdx.graphics.getWidth())
+            snakeX = Gdx.graphics.getWidth() - snakeHead.getWidth();
+        else if(snakeX < 0)
+            snakeX = 0;
+        if(snakeY + snakeHead.getHeight() > Gdx.graphics.getHeight())
+            snakeY = Gdx.graphics.getHeight() - snakeHead.getHeight();
+        else if(snakeY < 0)
+                snakeY = 0;
     }
 
     /**
