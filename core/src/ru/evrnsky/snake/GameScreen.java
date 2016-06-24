@@ -6,6 +6,7 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 
 /**
  *  It is main game screen
@@ -26,7 +27,7 @@ public class GameScreen extends ScreenAdapter {
      * It is constant and variable for movement.
      * Using for calculate time
      */
-    private static final float MOVE_TIME = 1f;
+    private static final float MOVE_TIME = 0.65f;
     private  float timer = MOVE_TIME;
     /**
      * It is constant for movement
@@ -52,6 +53,19 @@ public class GameScreen extends ScreenAdapter {
     private static final int DOWN = 3;
     private int snakeDirection = RIGHT;
 
+    /**
+     * Texture of apple
+     */
+    private Texture apple;
+    /**
+     * It is flag which means avaiable of apple
+     */
+    private boolean appleAvaiable = false;
+    /**
+     * Coords of apple
+     */
+    private int appleX = 0, appleY = 0;
+
 
     /**
      * At this method need init all variables and load textures
@@ -61,6 +75,7 @@ public class GameScreen extends ScreenAdapter {
     public void show() {
         batch = new SpriteBatch();
         snakeHead = new Texture(Gdx.files.internal("snakeHead.png"));
+        apple = new Texture(Gdx.files.internal("apple.png"));
     }
 
     /**
@@ -74,26 +89,46 @@ public class GameScreen extends ScreenAdapter {
          * Calculate may snake movement
          * If spend more than one second update timer and move snake
          */
-        checkBoundaries();
         handleInput();
 
         timer -= delta;
         if(timer <= 0) {
             timer = MOVE_TIME;
             snakeMovement();
+            checkBoundaries();
         }
+        checkAppleCollision();
+        checkAndPlaceApple();
 
         /**
-         * Clear screen before drawing
+         * Clear screen
          */
+        clearScreen();
+
+        /**
+         * Draw textures
+         */
+        draw();
+
+    }
+
+    /**
+     * Clear screen before drawing
+     */
+    private void clearScreen() {
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+    }
 
-        /**
-         * It is drawing section
-         */
+    /**
+     * It is drawing section
+     */
+
+    private void draw() {
         batch.begin();
         batch.draw(snakeHead, snakeX, snakeY);
+        if(appleAvaiable)
+            batch.draw(apple, appleX, appleY);
         batch.end();
     }
 
@@ -143,6 +178,23 @@ public class GameScreen extends ScreenAdapter {
             case DOWN:
                 snakeY -= SNAKE_MOVEMENT;
         }
+    }
+
+    public void checkAndPlaceApple() {
+        if(!appleAvaiable)
+            do {
+                appleX = MathUtils.random(Gdx.graphics.getWidth() / SNAKE_MOVEMENT - 1) * SNAKE_MOVEMENT;
+                appleY = MathUtils.random(Gdx.graphics.getWidth() / SNAKE_MOVEMENT - 1) * SNAKE_MOVEMENT;
+                appleAvaiable = true;
+            }while (snakeX == appleX && snakeY == appleY);
+    }
+
+    /**
+     * Check than we have collision
+     */
+    private void checkAppleCollision() {
+        if(appleX == snakeX && appleY == snakeY)
+            appleAvaiable = false;
     }
 
     /**
