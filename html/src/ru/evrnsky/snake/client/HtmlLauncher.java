@@ -5,6 +5,9 @@ import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import ru.evrnsky.snake.SnakeGame;
 
+/**
+ * Html launcher for web version
+ */
 public class HtmlLauncher extends GwtApplication {
 
         @Override

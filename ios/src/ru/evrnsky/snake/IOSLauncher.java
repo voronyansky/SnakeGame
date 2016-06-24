@@ -7,6 +7,9 @@ import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
 import ru.evrnsky.snake.SnakeGame;
 
+/**
+ * IOS launcher for apple version
+ */
 public class IOSLauncher extends IOSApplication.Delegate {
     @Override
     protected IOSApplication createApplication() {
