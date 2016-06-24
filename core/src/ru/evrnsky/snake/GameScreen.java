@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 
 /**
  *  It is main game screen
@@ -24,6 +25,12 @@ public class GameScreen extends ScreenAdapter {
      */
     private Texture snakeHead;
     /**
+     * It is texture of snake body
+     */
+    private Texture snakeBody;
+    private Array<BodyPart> bodyParts = new Array<BodyPart>();
+    private int snakeXBeforeUpdate = 0, snakeYBeforeUpdate = 0;
+    /**
      * It is constant and variable for movement.
      * Using for calculate time
      */
@@ -38,11 +45,11 @@ public class GameScreen extends ScreenAdapter {
     /**
      * It is x coord of snake
      */
-    private int snakeX = 0;
+    public int snakeX = 0;
     /**
      * It is y coord of snake
      */
-    private int snakeY = 0;
+    public int snakeY = 0;
 
     /**
      * This is constants for directions of movement
@@ -76,6 +83,7 @@ public class GameScreen extends ScreenAdapter {
         batch = new SpriteBatch();
         snakeHead = new Texture(Gdx.files.internal("snakeHead.png"));
         apple = new Texture(Gdx.files.internal("apple.png"));
+        snakeBody = new Texture(Gdx.files.internal("snakeBody.png"));
     }
 
     /**
@@ -96,9 +104,11 @@ public class GameScreen extends ScreenAdapter {
             timer = MOVE_TIME;
             snakeMovement();
             checkBoundaries();
+            bodyPartUpdate();
         }
         checkAppleCollision();
         checkAndPlaceApple();
+
 
         /**
          * Clear screen
@@ -129,6 +139,8 @@ public class GameScreen extends ScreenAdapter {
         batch.draw(snakeHead, snakeX, snakeY);
         if(appleAvaiable)
             batch.draw(apple, appleX, appleY);
+        for(BodyPart bodyPart : bodyParts)
+            bodyPart.draw(batch);
         batch.end();
     }
 
@@ -165,6 +177,8 @@ public class GameScreen extends ScreenAdapter {
      * Is it update snake position depends on direct
      */
     private void snakeMovement() {
+        snakeXBeforeUpdate = snakeX;
+        snakeYBeforeUpdate = snakeY;
         switch(snakeDirection) {
             case RIGHT:
                 snakeX += SNAKE_MOVEMENT;
@@ -177,6 +191,14 @@ public class GameScreen extends ScreenAdapter {
                 break;
             case DOWN:
                 snakeY -= SNAKE_MOVEMENT;
+        }
+    }
+
+    private void bodyPartUpdate() {
+        if(bodyParts.size > 0) {
+            BodyPart part = bodyParts.removeIndex(0);
+            part.setPosition(snakeXBeforeUpdate, snakeYBeforeUpdate);
+            bodyParts.add(part);
         }
     }
 
@@ -193,8 +215,12 @@ public class GameScreen extends ScreenAdapter {
      * Check than we have collision
      */
     private void checkAppleCollision() {
-        if(appleX == snakeX && appleY == snakeY)
+        if(appleX == snakeX && appleY == snakeY) {
+            BodyPart newPart = new BodyPart(snakeBody);
+            newPart.setPosition(snakeX, snakeY);
+            bodyParts.insert(0, newPart);
             appleAvaiable = false;
+        }
     }
 
     /**
@@ -238,6 +264,28 @@ public class GameScreen extends ScreenAdapter {
     public void dispose() {
         batch.dispose();
         snakeHead.dispose();
+    }
+
+    /**
+     * Inner class which determine a body part of snake
+     */
+    public class BodyPart {
+        private Texture bodyTexture;
+        private int x,y;
+
+        public BodyPart(Texture texture) {
+            this.bodyTexture = texture;
+        }
+
+        public void setPosition(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public void draw(SpriteBatch batch) {
+            if(!(snakeX == x && snakeY == y))
+                batch.draw(bodyTexture, x, y);
+        }
     }
 }
 
